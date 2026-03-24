@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>오늘마음날씨</title>
+<link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Nanum+Round+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #87CEEB;
+    --sun: #FFD93D;
+    --cloud: #F0F8FF;
+    --rain: #6B9FD4;
+    --storm: #5C6BC0;
+    --rainbow: #FF6B6B;
+    --night: #1a1a3e;
+    --bg: #EEF6FF;
+    --card: #FFFFFF;
+    --text: #2C3E50;
+    --soft: #8BA7C7;
+    --radius: 24px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nanum Round Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── APP SHELL ── */
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 20px 0;
+  }
+  .app-title {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-size: 20px; font-weight: 700;
+    background: linear-gradient(135deg, #4A90D9, #87CEEB);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .view-toggle {
+    display: flex; gap: 6px;
+  }
+  .view-btn {
+    width: 36px; height: 36px; border-radius: 12px; border: none;
+    background: var(--card); cursor: pointer; font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all .2s;
+  }
+  .view-btn.active { background: #4A90D9; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; padding: 16px 20px 100px; animation: fadeIn .3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── WEATHER HERO ── */
+  .weather-hero {
+    background: linear-gradient(160deg, #74B9FF 0%, #a8d8ff 60%, #dff0ff 100%);
+    border-radius: 28px; padding: 28px 24px 24px;
+    margin-bottom: 20px; position: relative; overflow: hidden;
+  }
+  .weather-hero::before {
+    content: '☁️';
+    position: absolute; top: 12px; right: 20px;
+    font-size: 48px; opacity: .4;
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .hero-date { font-size: 13px; color: rgba(255,255,255,.85); margin-bottom: 4px; }
+  .hero-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+  .hero-sub { font-size: 13px; color: rgba(255,255,255,.8); }
+
+  /* ── CALENDAR ── */
+  .cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .cal-nav { background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px 10px; }
+  .cal-month { font-size: 17px; font-weight: 800; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+  .cal-day-name {
+    text-align: center; font-size: 11px; color: var(--soft);
+    padding: 4px 0; font-weight: 700;
+  }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; cursor: pointer;
+    transition: all .15s; font-size: 13px; font-weight: 700;
+    position: relative;
+  }
+  .cal-day:hover { background: rgba(74,144,217,.1); }
+  .cal-day.today { background: #4A90D9; color: #fff; }
+  .cal-day.has-entry .mood-dot {
+    font-size: 16px; line-height: 1;
+  }
+  .cal-day.empty { cursor: default; }
+  .cal-day.other-month { opacity: .3; }
+
+  /* ── LIST ── */
+  .entry-list { display: flex; flex-direction: column; gap: 12px; }
+  .entry-card {
+    background: var(--card); border-radius: 20px; padding: 16px 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: flex; gap: 14px; align-items: flex-start;
+    cursor: pointer; transition: transform .15s, box-shadow .15s;
+  }
+  .entry-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .entry-mood-big { font-size: 40px; flex-shrink: 0; }
+  .entry-info { flex: 1; min-width: 0; }
+  .entry-date { font-size: 11px; color: var(--soft); margin-bottom: 3px; }
+  .entry-mood-label { font-size: 13px; font-weight: 800; color: #4A90D9; margin-bottom: 4px; }
+  .entry-preview {
+    font-size: 13px; color: #666; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .entry-img-thumb {
+    width: 52px; height: 52px; border-radius: 12px;
+    object-fit: cover; flex-shrink: 0;
+  }
+
+  /* ── WRITE SCREEN ── */
+  .section-label {
+    font-size: 13px; font-weight: 800; color: var(--soft);
+    margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px;
+  }
+  .mood-picker {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+    margin-bottom: 24px;
+  }
+  .mood-item {
+    background: var(--card); border-radius: 18px; padding: 14px 8px;
+    text-align: center; cursor: pointer; border: 2.5px solid transparent;
+    transition: all .2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .mood-item:hover { transform: scale(1.04); }
+  .mood-item.selected { border-color: #4A90D9; background: #EEF6FF; }
+  .mood-icon { font-size: 36px; margin-bottom: 6px; }
+  .mood-name { font-size: 12px; font-weight: 800; color: var(--text); }
+
+  .text-area {
+    width: 100%; min-height: 120px; border-radius: 18px;
+    border: 2px solid #E0ECFF; padding: 14px 16px;
+    font-family: 'Nanum Round Gothic', sans-serif; font-size: 15px;
+    resize: none; outline: none; background: var(--card);
+    transition: border-color .2s; color: var(--text);
+    margin-bottom: 12px;
+  }
+  .text-area:focus { border-color: #4A90D9; }
+  .text-area::placeholder { color: #BDD0E8; }
+
+  .voice-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: #EEF6FF; border: 2px solid #C8DEFF; border-radius: 14px;
+    padding: 10px 16px; cursor: pointer; font-family: inherit;
+    font-size: 13px; font-weight: 700; color: #4A90D9;
+    transition: all .2s; margin-bottom: 20px;
+  }
+  .voice-btn:hover { background: #D8ECFF; }
+  .voice-btn.recording { background: #FFE8E8; border-color: #FFB3B3; color: #E74C3C; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+  .img-upload-area {
+    border: 2px dashed #C8DEFF; border-radius: 18px; padding: 20px;
+    text-align: center; cursor: pointer; margin-bottom: 24px;
+    transition: all .2s; background: var(--card);
+  }
+  .img-upload-area:hover { border-color: #4A90D9; background: #EEF6FF; }
+  .img-upload-area .upload-icon { font-size: 28px; margin-bottom: 6px; }
+  .img-upload-area p { font-size: 12px; color: var(--soft); font-weight: 700; }
+  .img-preview-wrap { position: relative; display: inline-block; margin-bottom: 20px; }
+  .img-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 18px; }
+  .img-remove {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,.5); color: #fff; border: none;
+    border-radius: 50%; width: 28px; height: 28px; cursor: pointer;
+    font-size: 14px;
+  }
+
+  .save-btn {
+    width: 100%; padding: 16px; border-radius: 18px; border: none;
+    background: linear-gradient(135deg, #4A90D9, #74B9FF);
+    color: #fff; font-family: 'Gmarket Sans', sans-serif;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(74,144,217,.4);
+    transition: all .2s;
+  }
+  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,144,217,.5); }
+  .save-btn:disabled { opacity: .5; cursor: default; transform: none; }
+
+  /* ── DETAIL SCREEN ── */
+  .detail-mood-big { font-size: 80px; text-align: center; margin: 20px 0 8px; }
+  .detail-mood-name { text-align: center; font-size: 20px; font-weight: 800; color: #4A90D9; margin-bottom: 4px; }
+  .detail-date { text-align: center; font-size: 13px; color: var(--soft); margin-bottom: 24px; }
+  .detail-text {
+    background: var(--card); border-radius: 20px; padding: 20px;
+    font-size: 15px; line-height: 1.8; color: var(--text);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
+  .detail-img { width: 100%; border-radius: 20px; margin-bottom: 20px; }
+  .detail-actions { display: flex; gap: 10px; }
+  .action-btn {
+    flex: 1; padding: 14px; border-radius: 16px; border: none;
+    font-family: 'Nanum Round Gothic', sans-serif; font-size: 14px;
+    font-weight: 800; cursor: pointer; transition: all .2s;
+  }
+  .action-btn.edit { background: #EEF6FF; color: #4A90D9; }
+  .action-btn.delete { background: #FFF0F0; color: #E74C3C; }
+  .action-btn:hover { transform: translateY(-1px); }
+
+  /* ── SUB MOOD ── */
+  .sub-mood-wrap {
+    background: var(--card); border-radius: 20px; padding: 16px;
+    margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    animation: fadeIn .25s ease;
+  }
+  .sub-mood-title {
+    font-size: 13px; font-weight: 800; color: var(--soft);
+    margin-bottom: 12px; text-align: center;
+  }
+  .sub-mood-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .sub-mood-chip {
+    padding: 8px 14px; border-radius: 20px; border: 2px solid #E0ECFF;
+    background: #F8FBFF; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .15s; color: var(--text);
+  }
+  .sub-mood-chip:hover { border-color: #4A90D9; background: #EEF6FF; }
+  .sub-mood-chip.selected { background: #4A90D9; color: #fff; border-color: #4A90D9; }
+  .sub-mood-skip {
+    display: block; text-align: center; font-size: 12px; font-weight: 700;
+    color: var(--soft); background: none; border: none; cursor: pointer;
+    padding: 4px; width: 100%;
+  }
+  .sub-mood-skip:hover { color: #4A90D9; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0,0,0,.06);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 10px 20px 20px; z-index: 100;
+  }
+  .nav-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer; padding: 6px 16px;
+    border-radius: 14px; transition: all .15s;
+  }
+  .nav-btn .nav-icon { font-size: 22px; }
+  .nav-btn .nav-label { font-size: 10px; font-weight: 800; color: var(--soft); }
+  .nav-btn.active .nav-label { color: #4A90D9; }
+  .nav-btn:hover { background: #EEF6FF; }
+
+  .write-fab {
+    width: 56px; height: 56px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #4A90D9, #74B9FF);
+    font-size: 26px; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(74,144,217,.5);
+    transition: all .2s; color: #fff;
+  }
+  .write-fab:hover { transform: scale(1.08); }
+
+  /* ── BACK BTN ── */
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Nanum Round Gothic', sans-serif;
+    font-size: 14px; font-weight: 800; color: #4A90D9;
+    padding: 0; margin-bottom: 16px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--soft);
+  }
+  .empty-state .empty-icon { font-size: 60px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; font-weight: 700; line-height: 1.7; }
+
+  /* ── STATS ── */
+  .stats-character {
+    font-size: 72px; text-align: center; margin: 8px 0 0;
+    animation: float 3s ease-in-out infinite;
+  }
+  .stats-bubble {
+    background: var(--card); border-radius: 20px; padding: 14px 18px;
+    margin: 10px 0 20px; font-size: 14px; font-weight: 700;
+    line-height: 1.7; color: var(--text); text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); position: relative;
+  }
+  .stats-bubble::before {
+    content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-bottom-color: var(--card);
+  }
+  .stats-month-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .top3-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .top3-item {
+    background: var(--card); border-radius: 16px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .top3-rank { font-size: 18px; font-weight: 800; color: var(--soft); width: 28px; }
+  .top3-rank.gold { color: #FFD93D; }
+  .top3-rank.silver { color: #A8B8C8; }
+  .top3-rank.bronze { color: #CD7F32; }
+  .top3-icon { font-size: 32px; }
+  .top3-info { flex: 1; }
+  .top3-name { font-size: 14px; font-weight: 800; }
+  .top3-count { font-size: 12px; color: var(--soft); }
+  .top3-bar-wrap { width: 80px; height: 8px; background: #E8F0FB; border-radius: 4px; overflow: hidden; }
+  .top3-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#4A90D9,#74B9FF); transition: width .6s ease; }
+
+  .weekday-wrap {
+    background: var(--card); border-radius: 20px; padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+  }
+  .wd-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .wd-label { font-size: 11px; font-weight: 800; color: var(--soft); }
+  .wd-icon { font-size: 20px; min-height: 24px; }
+  .wd-count { font-size: 10px; color: var(--soft); font-weight: 700; }
+
+  /* ── LOCK SCREEN ── */
+  .lock-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(160deg, #74B9FF 0%, #4A90D9 60%, #2C6FBF 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+  .lock-screen.hidden { display: none; }
+  .lock-icon { font-size: 64px; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+  .lock-title {
+    font-family: 'Gmarket Sans', sans-serif; font-size: 24px; font-weight: 700;
+    color: #fff; margin-bottom: 6px;
+  }
+  .lock-sub { font-size: 13px; color: rgba(255,255,255,.8); margin-bottom: 40px; font-weight: 700; }
+  .pin-dots {
+    display: flex; gap: 16px; margin-bottom: 36px;
+  }
+  .pin-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2.5px solid rgba(255,255,255,.7);
+    background: transparent; transition: all .2s;
+  }
+  .pin-dot.filled { background: #fff; border-color: #fff; transform: scale(1.1); }
+  .pin-dot.error { background: #FF6B6B; border-color: #FF6B6B; animation: shake .3s ease; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+  }
+  .pin-keypad {
+    display: grid; grid-template-columns: repeat(3, 72px); gap: 14px;
+  }
+  .pin-key {
+    width: 72px; height: 72px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.2); backdrop-filter: blur(4px);
+    font-family: 'Gmarket Sans', sans-serif; font-size: 22px; font-weight: 700;
+    color: #fff; cursor: pointer; transition: all .15s;
+  }
+  .pin-key:hover { background: rgba(255,255,255,.35); transform: scale(1.05); }
+  .pin-key:active { transform: scale(0.95); }
+  .pin-key.empty { background: transparent; cursor: default; }
+  .pin-key.del { font-size: 18px; }
+  .lock-error {
+    margin-top: 16px; font-size: 13px; font-weight: 800;
+    color: #FFD93D; min-height: 20px; text-align: center;
+  }
+  .lock-no-pin {
+    margin-top: 20px; font-size: 12px; color: rgba(255,255,255,.6);
+    font-weight: 700; text-align: center;
+  }
+
+  .lock-cancel-btn {
+    margin-top: 24px; background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.4);
+    color: #fff; border-radius: 14px; padding: 10px 32px;
+    font-family: 'Nanum Round Gothic', sans-serif; font-size: 14px; font-weight: 800;
+    cursor: pointer; transition: all .2s;
+  }
+  .lock-cancel-btn:hover { background: rgba(255,255,255,.28); }
+
+  /* ── PIN SETTINGS ── */
+  .pin-setting-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card); border-radius: 16px; padding: 14px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: none; width: 100%;
+    font-family: 'Nanum Round Gothic', sans-serif; cursor: pointer;
+    margin-top: 12px;
+  }
+  .pin-setting-left { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; }
+  .pin-setting-right { font-size: 12px; color: var(--soft); font-weight: 700; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #2C3E50; color: #fff; border-radius: 14px; padding: 10px 20px;
+    font-size: 13px; font-weight: 700; opacity: 0; transition: all .3s;
+    pointer-events: none; z-index: 999; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<!-- LOCK SCREEN -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-icon">⛅</div>
+  <div class="lock-title">오늘마음날씨</div>
+  <div class="lock-sub" id="lockSub">비밀번호를 입력해줘</div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="dot0"></div>
+    <div class="pin-dot" id="dot1"></div>
+    <div class="pin-dot" id="dot2"></div>
+    <div class="pin-dot" id="dot3"></div>
+    <div class="pin-dot" id="dot4"></div>
+    <div class="pin-dot" id="dot5"></div>
+  </div>
+  <div class="pin-keypad">
+    <button class="pin-key" onclick="pinInput('1')">1</button>
+    <button class="pin-key" onclick="pinInput('2')">2</button>
+    <button class="pin-key" onclick="pinInput('3')">3</button>
+    <button class="pin-key" onclick="pinInput('4')">4</button>
+    <button class="pin-key" onclick="pinInput('5')">5</button>
+    <button class="pin-key" onclick="pinInput('6')">6</button>
+    <button class="pin-key" onclick="pinInput('7')">7</button>
+    <button class="pin-key" onclick="pinInput('8')">8</button>
+    <button class="pin-key" onclick="pinInput('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinInput('0')">0</button>
+    <button class="pin-key del" onclick="pinDelete()">⌫</button>
+  </div>
+  <div class="lock-error" id="lockError"></div>
+  <div class="lock-no-pin" id="lockNoPinMsg"></div>
+  <button class="lock-cancel-btn" id="lockCancelBtn" onclick="cancelPinSetting()" style="display:none;">취소</button>
+</div>
+
+<div class="app">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="app-title">오늘마음날씨 ⛅</div>
+    <div class="view-toggle" id="viewToggle" style="display:none;">
+      <button class="view-btn active" id="calViewBtn" onclick="setListView('cal')" title="달력">📅</button>
+      <button class="view-btn" id="listViewBtn" onclick="setListView('list')" title="목록">📋</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: HOME (달력) -->
+  <div class="screen active" id="screenHome">
+    <div class="weather-hero">
+      <div class="hero-date" id="heroDate"></div>
+      <div class="hero-title" id="heroTitle">안녕! 오늘 기분은?</div>
+      <div class="hero-sub" id="heroSub">오늘 마음 날씨를 기록해봐 🌈</div>
+    </div>
+
+    <!-- 달력 뷰 -->
+    <div id="calView">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+        <div class="cal-month" id="calMonth"></div>
+        <button class="cal-nav" onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <!-- 리스트 뷰 -->
+    <div id="listView" style="display:none;">
+      <div class="entry-list" id="entryList"></div>
+    </div>
+  </div>
+
+  <!-- SCREEN: WRITE -->
+  <div class="screen" id="screenWrite">
+    <button class="back-btn" onclick="goHome()">← 돌아가기</button>
+    <div class="section-label">오늘 기분이 어때?</div>
+    <div class="mood-picker" id="moodPicker"></div>
+
+    <!-- 세부 감정 (메인 선택 후 표시) -->
+    <div id="subMoodSection" style="display:none;">
+      <div class="sub-mood-wrap">
+        <div class="sub-mood-title" id="subMoodTitle">좀 더 자세히 말해줄래? 😊</div>
+        <div class="sub-mood-grid" id="subMoodGrid"></div>
+        <button class="sub-mood-skip" onclick="skipSubMood()">그냥 넘어갈게 →</button>
+      </div>
+    </div>
+
+    <div class="section-label">오늘 있었던 일</div>
+    <textarea class="text-area" id="diaryText" placeholder="오늘 어떤 일이 있었어? 짧아도 괜찮아 😊" rows="5"></textarea>
+    <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+      <span id="voiceIcon">🎙️</span>
+      <span id="voiceLabel">음성으로 말하기</span>
+    </button>
+
+    <div class="section-label">사진 추가 (선택)</div>
+    <div class="img-upload-area" id="imgUploadArea" onclick="document.getElementById('imgInput').click()">
+      <div class="upload-icon">📷</div>
+      <p>사진을 추가해봐!</p>
+    </div>
+    <div class="img-preview-wrap" id="imgPreviewWrap" style="display:none; width:100%;">
+      <img id="imgPreview" class="img-preview" src="" alt="미리보기">
+      <button class="img-remove" onclick="removeImg()">✕</button>
+    </div>
+    <input type="file" id="imgInput" accept="image/*" style="display:none;" onchange="handleImg(event)">
+
+    <button class="save-btn" id="saveBtn" onclick="saveEntry()">오늘 마음날씨 저장하기 ✨</button>
+  </div>
+
+  <!-- SCREEN: DETAIL -->
+  <div class="screen" id="screenDetail">
+    <button class="back-btn" onclick="goHome()">← 돌아가기</button>
+    <div class="detail-mood-big" id="detailMoodIcon"></div>
+    <div class="detail-mood-name" id="detailMoodName"></div>
+    <div class="detail-sub-mood" id="detailSubMood" style="text-align:center;font-size:13px;color:#4A90D9;font-weight:800;margin-bottom:4px;"></div>
+    <div class="detail-date" id="detailDate"></div>
+    <div class="detail-text" id="detailText"></div>
+    <img id="detailImg" class="detail-img" src="" alt="" style="display:none;">
+    <div class="detail-actions">
+      <button class="action-btn edit" onclick="editEntry()">✏️ 수정</button>
+      <button class="action-btn delete" onclick="deleteEntry()">🗑️ 삭제</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: STATS -->
+  <div class="screen" id="screenStats">
+    <div class="stats-character" id="statsCharacter"></div>
+    <div class="stats-bubble" id="statsBubble"></div>
+
+    <div class="stats-month-nav">
+      <button class="cal-nav" onclick="changeStatsMonth(-1)">‹</button>
+      <div class="cal-month" id="statsMonthLabel"></div>
+      <button class="cal-nav" onclick="changeStatsMonth(1)">›</button>
+    </div>
+
+    <div class="section-label">이번 달 감정 TOP 3</div>
+    <div class="top3-wrap" id="top3Wrap"></div>
+
+    <div class="section-label" style="margin-top:24px;">요일별 감정 패턴</div>
+    <div class="weekday-wrap" id="weekdayWrap"></div>
+
+    <div class="section-label" style="margin-top:24px;">보안 설정</div>
+    <button class="pin-setting-btn" onclick="openPinSetting()">
+      <div class="pin-setting-left">🔒 <span id="pinSettingLabel">비밀번호 설정</span></div>
+      <div class="pin-setting-right" id="pinSettingStatus">설정 안 됨</div>
+    </button>
+    <button class="pin-setting-btn" id="pinRemoveBtn" onclick="openPinRemove()" style="display:none;">
+      <div class="pin-setting-left">🔓 <span>비밀번호 해제</span></div>
+      <div class="pin-setting-right" style="color:#E74C3C;">해제하기</div>
+    </button>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn active" id="navHome" onclick="goHome()">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">홈</span>
+    </button>
+    <button class="write-fab" onclick="handleFab()" title="일기 쓰기">✏️</button>
+    <button class="nav-btn" id="navStat" onclick="goStats()">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">기록</span>
+    </button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const MOODS = [
+  { id:'happy', icon:'☀️', name:'신나요', color:'#FFD93D',
+    subs:['너무 좋아!','설레!','자랑하고 싶어','기대돼!'] },
+  { id:'good',  icon:'⛅', name:'좋아요', color:'#74B9FF',
+    subs:['뿌듯해','편안해','고마워','재밌었어'] },
+  { id:'meh',   icon:'🌤️',name:'그냥요', color:'#A8D8A8',
+    subs:['그냥 그래','모르겠어','피곤해','심심해'] },
+  { id:'sad',   icon:'🌧️',name:'슬퍼요', color:'#6B9FD4',
+    subs:['속상해','울고 싶어','외로워','보고 싶어'] },
+  { id:'angry', icon:'⛈️',name:'화나요', color:'#E17055',
+    subs:['짜증나','억울해','실망했어','무서워'] },
+  { id:'tired', icon:'🌙', name:'피곤해요',color:'#9B8EC4',
+    subs:['지쳐','하기 싫어','졸려','머리 아파'] },
+];
+
+let entries = JSON.parse(localStorage.getItem('moodiary_entries') || '[]');
+let currentDate = new Date();
+let calYear = currentDate.getFullYear();
+let calMonth = currentDate.getMonth();
+let selectedMood = null;
+let selectedSubMood = null;
+let uploadedImg = null;
+let editingId = null;
+let currentDetailId = null;
+let recognition = null;
+let isRecording = false;
+let currentView = 'cal';
+
+// ── PIN LOCK ──
+let pinBuffer = '';
+let pinMode = 'verify'; // 'verify' | 'set-new' | 'set-confirm' | 'verify-then-set'
+let pinTemp = '';
+
+function initLock() {
+  const savedPin = localStorage.getItem('moodiary_pin');
+  if (!savedPin) {
+    document.getElementById('lockScreen').classList.add('hidden');
+    initApp();
+    return;
+  }
+  pinMode = 'verify';
+  pinBuffer = '';
+  document.getElementById('lockSub').textContent = '비밀번호를 입력해줘 🔒';
+  document.getElementById('lockNoPinMsg').textContent = '';
+  document.getElementById('lockError').textContent = '';
+  updateDots();
+}
+
+function pinInput(num) {
+  if (pinBuffer.length >= 6) return;
+  pinBuffer += num;
+  updateDots();
+  if (pinBuffer.length === 6) {
+    setTimeout(() => handlePinComplete(), 150);
+  }
+}
+
+function pinDelete() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  for (let i = 0; i < 6; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.toggle('filled', i < pinBuffer.length);
+    dot.classList.remove('error');
+  }
+}
+
+function handlePinComplete() {
+  const savedPin = localStorage.getItem('moodiary_pin');
+
+  if (pinMode === 'verify') {
+    if (pinBuffer === savedPin) {
+      document.getElementById('lockScreen').classList.add('hidden');
+      initApp();
+    } else {
+      showPinError('비밀번호가 틀렸어! 다시 눌러봐 😢');
+    }
+
+  } else if (pinMode === 'verify-then-set') {
+    if (pinBuffer === savedPin) {
+      pinBuffer = '';
+      pinTemp = '';
+      pinMode = 'set-new';
+      updateDots();
+      document.getElementById('lockSub').textContent = '새 비밀번호 6자리를 눌러줘 🔢';
+      document.getElementById('lockError').textContent = '';
+    } else {
+      showPinError('기존 비밀번호가 틀렸어! 😢');
+    }
+
+  } else if (pinMode === 'set-new') {
+    pinTemp = pinBuffer;
+    pinBuffer = '';
+    updateDots();
+    pinMode = 'set-confirm';
+    document.getElementById('lockSub').textContent = '한 번 더 입력해줘 ✅';
+    document.getElementById('lockError').textContent = '';
+
+  } else if (pinMode === 'set-confirm') {
+    if (pinBuffer === pinTemp) {
+      localStorage.setItem('moodiary_pin', pinBuffer);
+      document.getElementById('lockScreen').classList.add('hidden');
+      document.getElementById('lockCancelBtn').style.display = 'none';
+      updatePinSettingUI();
+      showToast('비밀번호가 설정됐어! 🔒');
+    } else {
+      showPinError('번호가 달라! 처음부터 다시 해봐 😅');
+      setTimeout(() => {
+        pinMode = 'set-new';
+        pinTemp = '';
+        document.getElementById('lockSub').textContent = '새 비밀번호 6자리를 눌러줘 🔢';
+      }, 900);
+    }
+  }
+}
+
+function showPinError(msg) {
+  document.getElementById('lockError').textContent = msg;
+  for (let i = 0; i < 6; i++) {
+    document.getElementById('dot'+i).classList.add('error');
+  }
+  setTimeout(() => {
+    pinBuffer = '';
+    updateDots();
+    document.getElementById('lockError').textContent = '';
+  }, 900);
+}
+
+function openPinSetting() {
+  const savedPin = localStorage.getItem('moodiary_pin');
+  pinBuffer = '';
+  pinTemp = '';
+  if (savedPin) {
+    pinMode = 'verify-then-set';
+    showLockForSetting('기존 비밀번호를 입력해줘 🔒');
+  } else {
+    pinMode = 'set-new';
+    showLockForSetting('새 비밀번호 6자리를 눌러줘 🔢');
+  }
+}
+
+function openPinRemove() {
+  const savedPin = localStorage.getItem('moodiary_pin');
+  if (!savedPin) return;
+  localStorage.removeItem('moodiary_pin');
+  updatePinSettingUI();
+  showToast('비밀번호가 해제됐어 🔓');
+}
+
+function showLockForSetting(msg) {
+  pinBuffer = '';
+  updateDots();
+  document.getElementById('lockSub').textContent = msg;
+  document.getElementById('lockError').textContent = '';
+  document.getElementById('lockNoPinMsg').textContent = '';
+  document.getElementById('lockCancelBtn').style.display = 'block';
+  document.getElementById('lockScreen').classList.remove('hidden');
+}
+
+function cancelPinSetting() {
+  pinBuffer = '';
+  pinTemp = '';
+  document.getElementById('lockCancelBtn').style.display = 'none';
+  document.getElementById('lockScreen').classList.add('hidden');
+}
+
+function updatePinSettingUI() {
+  const hasPin = !!localStorage.getItem('moodiary_pin');
+  const label = document.getElementById('pinSettingLabel');
+  const status = document.getElementById('pinSettingStatus');
+  const removeBtn = document.getElementById('pinRemoveBtn');
+  if (hasPin) {
+    label.textContent = '비밀번호 수정';
+    status.textContent = '설정됨 🔒';
+    if (removeBtn) removeBtn.style.display = 'flex';
+  } else {
+    label.textContent = '비밀번호 설정';
+    status.textContent = '설정 안 됨';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+function initApp() {
+  renderHero();
+  renderMoodPicker();
+  renderCalendar();
+  updatePinSettingUI();
+  document.getElementById('viewToggle').style.display = 'flex';
+}
+
+// ── INIT ──
+function init() {
+  initLock();
+}
+
+function renderHero() {
+  const now = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('heroDate').textContent =
+    `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`;
+  const todayStr = toDateStr(now);
+  const todayEntry = entries.find(e => e.date === todayStr);
+  if (todayEntry) {
+    const mood = MOODS.find(m => m.id === todayEntry.mood);
+    document.getElementById('heroTitle').textContent = `오늘은 ${mood.icon} ${mood.name}`;
+    document.getElementById('heroSub').textContent = todayEntry.text ? todayEntry.text.slice(0,30)+'...' : '일기를 작성했어요!';
+  } else {
+    document.getElementById('heroTitle').textContent = '안녕! 오늘 기분은?';
+    document.getElementById('heroSub').textContent = '오늘 마음 날씨를 기록해봐 🌈';
+  }
+}
+
+// ── CALENDAR ──
+function renderCalendar() {
+  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('calMonth').textContent = `${calYear}년 ${months[calMonth]}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  ['일','월','화','수','목','금','토'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name'; el.textContent = d;
+    grid.appendChild(el);
+  });
+  const first = new Date(calYear, calMonth, 1);
+  const last = new Date(calYear, calMonth+1, 0);
+  const today = toDateStr(new Date());
+  for (let i = 0; i < first.getDay(); i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+  for (let d = 1; d <= last.getDate(); d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const entry = entries.find(e => e.date === dateStr);
+    const el = document.createElement('div');
+    el.className = 'cal-day' + (dateStr === today ? ' today' : '') + (entry ? ' has-entry' : '');
+    if (entry) {
+      const mood = MOODS.find(m => m.id === entry.mood);
+      el.innerHTML = `<span class="mood-dot">${mood.icon}</span>`;
+    } else {
+      el.innerHTML = `<span style="font-size:13px">${d}</span>`;
+    }
+    if (entry) el.onclick = () => showDetail(entry.id);
+    else el.onclick = () => goWrite(dateStr);
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+// ── LIST VIEW ──
+function renderList() {
+  const list = document.getElementById('entryList');
+  const sorted = [...entries].sort((a,b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">☁️</div><p>아직 일기가 없어요.<br>오늘 마음날씨를 기록해봐요!</p></div>`;
+    return;
+  }
+  list.innerHTML = sorted.map(e => {
+    const mood = MOODS.find(m => m.id === e.mood);
+    const dateObj = new Date(e.date);
+    const days = ['일','월','화','수','목','금','토'];
+    const dateLabel = `${dateObj.getMonth()+1}월 ${dateObj.getDate()}일 ${days[dateObj.getDay()]}요일`;
+    return `<div class="entry-card" onclick="showDetail('${e.id}')">
+      <div class="entry-mood-big">${mood.icon}</div>
+      <div class="entry-info">
+        <div class="entry-date">${dateLabel}</div>
+        <div class="entry-mood-label">${mood.name}</div>
+        <div class="entry-preview">${e.text || '(내용 없음)'}</div>
+      </div>
+      ${e.img ? `<img class="entry-img-thumb" src="${e.img}" alt="">` : ''}
+    </div>`;
+  }).join('');
+}
+
+function setListView(v) {
+  currentView = v;
+  document.getElementById('calView').style.display = v === 'cal' ? 'block' : 'none';
+  document.getElementById('listView').style.display = v === 'list' ? 'block' : 'none';
+  document.getElementById('calViewBtn').classList.toggle('active', v === 'cal');
+  document.getElementById('listViewBtn').classList.toggle('active', v === 'list');
+  if (v === 'list') renderList();
+}
+
+// ── MOOD PICKER ──
+function renderMoodPicker() {
+  const picker = document.getElementById('moodPicker');
+  picker.innerHTML = MOODS.map(m => `
+    <div class="mood-item" id="mood_${m.id}" onclick="selectMood('${m.id}')">
+      <div class="mood-icon">${m.icon}</div>
+      <div class="mood-name">${m.name}</div>
+    </div>`).join('');
+}
+
+function selectMood(id) {
+  selectedMood = id;
+  selectedSubMood = null;
+  MOODS.forEach(m => document.getElementById('mood_'+m.id).classList.toggle('selected', m.id === id));
+
+  // 세부 감정 렌더링
+  const mood = MOODS.find(m => m.id === id);
+  const subSection = document.getElementById('subMoodSection');
+  const subGrid = document.getElementById('subMoodGrid');
+  const subTitle = document.getElementById('subMoodTitle');
+
+  subTitle.textContent = `${mood.icon} ${mood.name} — 어떤 느낌이야?`;
+  subGrid.innerHTML = mood.subs.map(s => `
+    <div class="sub-mood-chip" onclick="selectSubMood(this, '${s}')">${s}</div>
+  `).join('');
+  subSection.style.display = 'block';
+}
+
+function selectSubMood(el, val) {
+  selectedSubMood = val;
+  document.querySelectorAll('.sub-mood-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function skipSubMood() {
+  selectedSubMood = null;
+  document.getElementById('subMoodSection').style.display = 'none';
+}
+
+// ── VOICE ──
+function toggleVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast('Chrome 브라우저에서 사용해줘! 🎙️');
+    return;
+  }
+  if (isRecording) {
+    recognition && recognition.stop();
+    return;
+  }
+  // 마이크 권한 먼저 요청
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(() => {
+    recognition = new SR();
+    recognition.lang = 'ko-KR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('voiceBtn').classList.add('recording');
+      document.getElementById('voiceIcon').textContent = '⏹️';
+      document.getElementById('voiceLabel').textContent = '듣고 있어요... (탭해서 멈추기)';
+    };
+    recognition.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      const ta = document.getElementById('diaryText');
+      ta.value = ta.value ? ta.value + ' ' + text : text;
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceIcon').textContent = '🎙️';
+      document.getElementById('voiceLabel').textContent = '음성으로 말하기';
+    };
+    recognition.onerror = (e) => {
+      isRecording = false;
+      document.getElementById('voiceBtn').classList.remove('recording');
+      document.getElementById('voiceIcon').textContent = '🎙️';
+      document.getElementById('voiceLabel').textContent = '음성으로 말하기';
+      if (e.error === 'not-allowed') showToast('마이크 권한을 허용해줘! 🎙️');
+      else if (e.error === 'no-speech') showToast('말소리가 안 들려요. 다시 눌러봐! 😊');
+      else showToast('음성 인식 오류. 다시 시도해봐!');
+    };
+    recognition.start();
+  }).catch(() => {
+    showToast('마이크 권한을 허용해줘! 🎙️');
+  });
+}
+
+// ── FAB (쓰기 모드 중 클릭 방지) ──
+let isWriteMode = false;
+function handleFab() {
+  if (isWriteMode) {
+    showToast('먼저 저장하거나 돌아가줘! 😊');
+    return;
+  }
+  goWrite();
+}
+
+// ── IMAGE ──
+function handleImg(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    uploadedImg = ev.target.result;
+    document.getElementById('imgPreview').src = uploadedImg;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgUploadArea').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImg() {
+  uploadedImg = null;
+  document.getElementById('imgInput').value = '';
+  document.getElementById('imgPreviewWrap').style.display = 'none';
+  document.getElementById('imgUploadArea').style.display = 'block';
+}
+
+// ── SAVE ──
+function saveEntry() {
+  if (!selectedMood) { showToast('기분을 먼저 골라줘! 😊'); return; }
+  const text = document.getElementById('diaryText').value.trim();
+  const dateStr = editingId ? entries.find(e=>e.id===editingId).date : toDateStr(new Date());
+
+  if (editingId) {
+    const idx = entries.findIndex(e => e.id === editingId);
+    entries[idx] = { ...entries[idx], mood: selectedMood, subMood: selectedSubMood, text, img: uploadedImg };
+  } else {
+    const existing = entries.findIndex(e => e.date === dateStr);
+    if (existing >= 0) entries[existing] = { ...entries[existing], mood: selectedMood, subMood: selectedSubMood, text, img: uploadedImg };
+    else entries.push({ id: Date.now().toString(), date: dateStr, mood: selectedMood, subMood: selectedSubMood, text, img: uploadedImg });
+  }
+
+  localStorage.setItem('moodiary_entries', JSON.stringify(entries));
+  showToast('오늘 마음날씨 저장 완료! ✨');
+  resetWrite();
+  setWriteMode(false);
+  goHome();
+}
+
+function resetWrite() {
+  selectedMood = null;
+  selectedSubMood = null;
+  editingId = null;
+  uploadedImg = null;
+  document.getElementById('diaryText').value = '';
+  document.getElementById('imgInput').value = '';
+  document.getElementById('imgPreviewWrap').style.display = 'none';
+  document.getElementById('imgUploadArea').style.display = 'block';
+  document.getElementById('subMoodSection').style.display = 'none';
+  renderMoodPicker();
+}
+
+// ── DETAIL ──
+function showDetail(id) {
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+  currentDetailId = id;
+  const mood = MOODS.find(m => m.id === entry.mood);
+  const dateObj = new Date(entry.date);
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('detailMoodIcon').textContent = mood.icon;
+  document.getElementById('detailMoodName').textContent = mood.name;
+  const subEl = document.getElementById('detailSubMood');
+  subEl.textContent = entry.subMood ? `"${entry.subMood}"` : '';
+  document.getElementById('detailDate').textContent =
+    `${dateObj.getFullYear()}년 ${dateObj.getMonth()+1}월 ${dateObj.getDate()}일 ${days[dateObj.getDay()]}요일`;
+  document.getElementById('detailText').textContent = entry.text || '(내용이 없어요)';
+  const img = document.getElementById('detailImg');
+  if (entry.img) { img.src = entry.img; img.style.display = 'block'; }
+  else img.style.display = 'none';
+  showScreen('screenDetail');
+  setNavActive(null);
+  document.getElementById('viewToggle').style.display = 'none';
+}
+
+function editEntry() {
+  const entry = entries.find(e => e.id === currentDetailId);
+  if (!entry) return;
+  editingId = currentDetailId;
+  selectedMood = entry.mood;
+  selectedSubMood = entry.subMood || null;
+  uploadedImg = entry.img || null;
+  document.getElementById('diaryText').value = entry.text || '';
+  renderMoodPicker();
+  document.getElementById('mood_'+entry.mood)?.classList.add('selected');
+
+  // 세부 감정 복원
+  const mood = MOODS.find(m => m.id === entry.mood);
+  const subSection = document.getElementById('subMoodSection');
+  const subGrid = document.getElementById('subMoodGrid');
+  const subTitle = document.getElementById('subMoodTitle');
+  subTitle.textContent = `${mood.icon} ${mood.name} — 어떤 느낌이야?`;
+  subGrid.innerHTML = mood.subs.map(s => `
+    <div class="sub-mood-chip ${entry.subMood===s?'selected':''}" onclick="selectSubMood(this, '${s}')">${s}</div>
+  `).join('');
+  subSection.style.display = 'block';
+
+  if (entry.img) {
+    document.getElementById('imgPreview').src = entry.img;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgUploadArea').style.display = 'none';
+  }
+  showScreen('screenWrite');
+  setNavActive(null);
+  setWriteMode(true);
+  document.getElementById('viewToggle').style.display = 'none';
+}
+
+function deleteEntry() {
+  if (!confirm('이 일기를 삭제할까요?')) return;
+  entries = entries.filter(e => e.id !== currentDetailId);
+  localStorage.setItem('moodiary_entries', JSON.stringify(entries));
+  showToast('일기를 삭제했어요');
+  goHome();
+}
+
+let statsYear = new Date().getFullYear();
+let statsMonth = new Date().getMonth();
+
+// ── STATS ──
+const CHAR_MESSAGES = {
+  happy:  { char: '☀️', msg: '와! 이번 달은 신나는 날이 많았네!\n정말 멋진 한 달을 보냈구나 🌟' },
+  good:   { char: '⛅', msg: '좋은 날들이 많았어!\n날씨처럼 마음도 맑았던 한 달이야 😊' },
+  meh:    { char: '🌤️', msg: '그냥그냥한 날들도 괜찮아.\n그런 날이 있어야 좋은 날이 더 빛나거든! 💪' },
+  sad:    { char: '🌧️', msg: '비 오는 날이 많았구나...\n비가 온 뒤에 무지개가 뜨는 거 알지? 🌈\n괜찮아, 곧 해가 날 거야!' },
+  angry:  { char: '⛈️', msg: '천둥번개 같은 날들이 있었네.\n화날 때 일기 써줘서 고마워!\n털어놓으면 조금 가벼워지거든 ⚡' },
+  tired:  { char: '🌙', msg: '피곤한 날들이 많았구나.\n충분히 쉬어도 괜찮아.\n달도 매일 밤 쉬면서 빛나잖아 🌙' },
+  none:   { char: '🌈', msg: '이번 달 기록이 없어!\n오늘부터 마음날씨를 적어볼까? ✨' }
+};
+
+function goStats() {
+  statsYear = new Date().getFullYear();
+  statsMonth = new Date().getMonth();
+  renderStats();
+  showScreen('screenStats');
+  setNavActive('navStat');
+  document.getElementById('viewToggle').style.display = 'none';
+}
+
+function changeStatsMonth(dir) {
+  statsMonth += dir;
+  if (statsMonth < 0) { statsMonth = 11; statsYear--; }
+  if (statsMonth > 11) { statsMonth = 0; statsYear++; }
+  renderStats();
+}
+
+function renderStats() {
+  const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('statsMonthLabel').textContent = `${statsYear}년 ${months[statsMonth]}`;
+
+  // 해당 월 엔트리 필터
+  const prefix = `${statsYear}-${String(statsMonth+1).padStart(2,'0')}`;
+  const monthEntries = entries.filter(e => e.date.startsWith(prefix));
+
+  // 캐릭터 메시지
+  let charData;
+  if (monthEntries.length === 0) {
+    charData = CHAR_MESSAGES.none;
+  } else {
+    const moodCount = {};
+    monthEntries.forEach(e => { moodCount[e.mood] = (moodCount[e.mood]||0)+1; });
+    const topMood = Object.entries(moodCount).sort((a,b)=>b[1]-a[1])[0][0];
+    charData = CHAR_MESSAGES[topMood] || CHAR_MESSAGES.none;
+  }
+  document.getElementById('statsCharacter').textContent = charData.char;
+  document.getElementById('statsBubble').textContent = charData.msg;
+
+  // TOP3
+  const moodCount = {};
+  monthEntries.forEach(e => { moodCount[e.mood] = (moodCount[e.mood]||0)+1; });
+  const sorted = Object.entries(moodCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const maxCount = sorted[0]?.[1] || 1;
+  const rankClass = ['gold','silver','bronze'];
+  const rankLabel = ['1위','2위','3위'];
+
+  const top3 = document.getElementById('top3Wrap');
+  if (sorted.length === 0) {
+    top3.innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-icon" style="font-size:40px">📭</div><p>이번 달 기록이 없어요!</p></div>`;
+  } else {
+    top3.innerHTML = sorted.map(([moodId, cnt], i) => {
+      const mood = MOODS.find(m => m.id === moodId);
+      const pct = Math.round((cnt/maxCount)*100);
+      return `<div class="top3-item">
+        <div class="top3-rank ${rankClass[i]}">${rankLabel[i]}</div>
+        <div class="top3-icon">${mood.icon}</div>
+        <div class="top3-info">
+          <div class="top3-name">${mood.name}</div>
+          <div class="top3-count">${cnt}일</div>
+        </div>
+        <div class="top3-bar-wrap"><div class="top3-bar" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // 요일별 패턴
+  const dayNames = ['일','월','화','수','목','금','토'];
+  const dayMoods = Array(7).fill(null).map(()=>({count:{},total:0}));
+  monthEntries.forEach(e => {
+    const d = new Date(e.date).getDay();
+    dayMoods[d].count[e.mood] = (dayMoods[d].count[e.mood]||0)+1;
+    dayMoods[d].total++;
+  });
+
+  document.getElementById('weekdayWrap').innerHTML = dayNames.map((name,i) => {
+    const data = dayMoods[i];
+    let icon = '—'; let cnt = '';
+    if (data.total > 0) {
+      const top = Object.entries(data.count).sort((a,b)=>b[1]-a[1])[0][0];
+      icon = MOODS.find(m=>m.id===top).icon;
+      cnt = `${data.total}일`;
+    }
+    return `<div class="wd-col">
+      <div class="wd-label">${name}</div>
+      <div class="wd-icon">${icon}</div>
+      <div class="wd-count">${cnt}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── NAV ──
+function goHome() {
+  resetWrite();
+  renderHero();
+  renderCalendar();
+  if (currentView === 'list') renderList();
+  showScreen('screenHome');
+  setNavActive('navHome');
+  document.getElementById('viewToggle').style.display = 'flex';
+  setWriteMode(false);
+}
+
+function goWrite(dateStr) {
+  resetWrite();
+  showScreen('screenWrite');
+  setNavActive(null);
+  document.getElementById('viewToggle').style.display = 'none';
+  setWriteMode(true);
+  if (dateStr) {
+    const existing = entries.find(e => e.date === dateStr);
+    if (existing) {
+      editingId = existing.id;
+      selectedMood = existing.mood;
+      uploadedImg = existing.img || null;
+      document.getElementById('diaryText').value = existing.text || '';
+      renderMoodPicker();
+      document.getElementById('mood_'+existing.mood)?.classList.add('selected');
+      if (existing.img) {
+        document.getElementById('imgPreview').src = existing.img;
+        document.getElementById('imgPreviewWrap').style.display = 'block';
+        document.getElementById('imgUploadArea').style.display = 'none';
+      }
+    }
+  }
+}
+
+function setWriteMode(on) {
+  isWriteMode = on;
+  const statBtn = document.getElementById('navStat');
+  const fab = document.querySelector('.write-fab');
+  if (on) {
+    statBtn.innerHTML = `<span class="nav-icon">💾</span><span class="nav-label">저장</span>`;
+    statBtn.onclick = saveEntry;
+    fab.style.opacity = '0.4';
+  } else {
+    statBtn.innerHTML = `<span class="nav-icon">📊</span><span class="nav-label">기록</span>`;
+    statBtn.onclick = goStats;
+    fab.style.opacity = '1';
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function setNavActive(id) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (id) document.getElementById(id)?.classList.add('active');
+}
+
+// ── UTILS ──
+function toDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+init();
+</script>
+</body>
+</html>
