@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <!-- 배경 -->
+  <rect width="180" height="180" rx="40" fill="#FFF8E7"/>
+
+  <!-- 일기장 책 -->
+  <rect x="38" y="28" width="104" height="124" rx="8" fill="#FF8C69"/>
+  <!-- 책 오른쪽 페이지 느낌 -->
+  <rect x="50" y="28" width="92" height="124" rx="6" fill="#FFFDF5"/>
+
+  <!-- 스프링 고리들 -->
+  <circle cx="50" cy="52" r="7" fill="none" stroke="#FF8C69" stroke-width="4"/>
+  <circle cx="50" cy="78" r="7" fill="none" stroke="#FF8C69" stroke-width="4"/>
+  <circle cx="50" cy="104" r="7" fill="none" stroke="#FF8C69" stroke-width="4"/>
+  <circle cx="50" cy="130" r="7" fill="none" stroke="#FF8C69" stroke-width="4"/>
+
+  <!-- 줄 (글줄) -->
+  <line x1="68" y1="62" x2="128" y2="62" stroke="#DDEEFF" stroke-width="3" stroke-linecap="round"/>
+  <line x1="68" y1="76" x2="128" y2="76" stroke="#DDEEFF" stroke-width="3" stroke-linecap="round"/>
+  <line x1="68" y1="90" x2="128" y2="90" stroke="#DDEEFF" stroke-width="3" stroke-linecap="round"/>
+  <line x1="68" y1="104" x2="110" y2="104" stroke="#DDEEFF" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- 귀여운 해 -->
+  <circle cx="116" cy="115" r="16" fill="#FFD94A"/>
+  <!-- 해 광선 -->
+  <line x1="116" y1="95" x2="116" y2="91" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="116" y1="135" x2="116" y2="139" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="96" y1="115" x2="92" y2="115" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="136" y1="115" x2="140" y2="115" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="102" y1="101" x2="99" y2="98" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="130" y1="129" x2="133" y2="132" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="130" y1="101" x2="133" y2="98" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="102" y1="129" x2="99" y2="132" stroke="#FFD94A" stroke-width="3" stroke-linecap="round"/>
+  <!-- 해 얼굴 -->
+  <circle cx="112" cy="112" r="2.5" fill="#3D2B00"/>
+  <circle cx="120" cy="112" r="2.5" fill="#3D2B00"/>
+  <path d="M 110 118 Q 116 123 122 118" stroke="#3D2B00" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
