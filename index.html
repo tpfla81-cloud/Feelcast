@@ -922,44 +922,38 @@ function toggleVoice() {
     recognition && recognition.stop();
     return;
   }
-  // 마이크 권한 먼저 요청
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(() => {
-    recognition = new SR();
-    recognition.lang = 'ko-KR';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.onstart = () => {
-      isRecording = true;
-      document.getElementById('voiceBtn').classList.add('recording');
-      document.getElementById('voiceIcon').textContent = '⏹️';
-      document.getElementById('voiceLabel').textContent = '듣고 있어요... (탭해서 멈추기)';
-    };
-    recognition.onresult = (e) => {
-      const text = e.results[0][0].transcript;
-      const ta = document.getElementById('diaryText');
-      ta.value = ta.value ? ta.value + ' ' + text : text;
-    };
-    recognition.onend = () => {
-      isRecording = false;
-      document.getElementById('voiceBtn').classList.remove('recording');
-      document.getElementById('voiceIcon').textContent = '🎙️';
-      document.getElementById('voiceLabel').textContent = '음성으로 말하기';
-    };
-    recognition.onerror = (e) => {
-      isRecording = false;
-      document.getElementById('voiceBtn').classList.remove('recording');
-      document.getElementById('voiceIcon').textContent = '🎙️';
-      document.getElementById('voiceLabel').textContent = '음성으로 말하기';
-      if (e.error === 'not-allowed') showToast('마이크 권한을 허용해줘! 🎙️');
-      else if (e.error === 'no-speech') showToast('말소리가 안 들려요. 다시 눌러봐! 😊');
-      else showToast('음성 인식 오류. 다시 시도해봐!');
-    };
-    recognition.start();
-  }).catch(() => {
-    showToast('마이크 권한을 허용해줘! 🎙️');
-  });
+  recognition = new SR();
+  recognition.lang = 'ko-KR';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('voiceBtn').classList.add('recording');
+    document.getElementById('voiceIcon').textContent = '⏹️';
+    document.getElementById('voiceLabel').textContent = '듣고 있어요... (탭해서 멈추기)';
+  };
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    const ta = document.getElementById('diaryText');
+    ta.value = ta.value ? ta.value + ' ' + text : text;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('voiceBtn').classList.remove('recording');
+    document.getElementById('voiceIcon').textContent = '🎙️';
+    document.getElementById('voiceLabel').textContent = '음성으로 말하기';
+  };
+  recognition.onerror = (e) => {
+    isRecording = false;
+    document.getElementById('voiceBtn').classList.remove('recording');
+    document.getElementById('voiceIcon').textContent = '🎙️';
+    document.getElementById('voiceLabel').textContent = '음성으로 말하기';
+    if (e.error === 'not-allowed') showToast('마이크 권한을 허용해줘! 🎙️');
+    else if (e.error === 'no-speech') showToast('말소리가 안 들려요. 다시 눌러봐! 😊');
+    else showToast('음성 인식 오류. 다시 시도해봐!');
+  };
+  recognition.start();
 }
-
 // ── FAB (쓰기 모드 중 클릭 방지) ──
 let isWriteMode = false;
 function handleFab() {
