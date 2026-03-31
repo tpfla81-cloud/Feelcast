@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-title" content="오늘마음날씨">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Nanum+Round+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Nanum+Round+Gothic:wght@400;700;800&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --sky: #87CEEB;
@@ -27,8 +27,8 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Nanum Round Gothic', sans-serif;
-    background: var(--bg);
+    font-family: 'Gaegu', 'Nanum Pen Script', cursive;
+    background: #faf9f7;
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
@@ -74,27 +74,72 @@
   .hero-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 2px; }
   .hero-sub { font-size: 13px; color: rgba(255,255,255,.8); }
 
+  /* ── WELCOME CARD ── */
+  .welcome-card {
+    background: linear-gradient(135deg, #fff 0%, #fff8f0 100%);
+    border-radius: 24px; padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    animation: fadeIn .4s ease;
+  }
+  .welcome-card h3 { font-size: 22px; font-weight: 700; color: #44403c; margin-bottom: 4px; font-family: 'Gaegu', cursive; }
+  .welcome-card p { font-size: 16px; color: #a8a29e; font-family: 'Gaegu', cursive; }
+
+  /* ── CALENDAR ── */
+  .cal-wrap {
+    background: #ffffff;
+    border-radius: 24px; padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+  }
   .cal-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 24px;
   }
-  .cal-nav { background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px 10px; }
-  .cal-month { font-size: 17px; font-weight: 800; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+  .cal-nav {
+    width: 40px; height: 40px; border-radius: 16px; border: none;
+    background: #f5f5f4; cursor: pointer; font-size: 18px; color: #a8a29e;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .cal-nav:hover { color: #f97316; background: #fff7ed; }
+  .cal-nav:active { transform: scale(0.92); }
+  .cal-month { font-size: 20px; font-weight: 900; color: #1c1917; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
   .cal-day-name {
-    text-align: center; font-size: 11px; color: var(--soft);
-    padding: 4px 0; font-weight: 700;
+    text-align: center; font-size: 10px; color: #d6d3d1;
+    padding: 6px 0; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
   }
+  .cal-day-name:first-child { color: #fca5a5; }
+  .cal-day-name:last-child { color: #93c5fd; }
   .cal-day {
-    aspect-ratio: 1; border-radius: 14px; display: flex; flex-direction: column;
+    aspect-ratio: 1; border-radius: 16px; display: flex; flex-direction: column;
     align-items: center; justify-content: center; cursor: pointer;
-    transition: all .15s; font-size: 13px; font-weight: 700; position: relative;
+    transition: transform .15s;
+    border: none;
+    background: #f5f4f0;
+    position: relative; gap: 1px;
   }
-  .cal-day:hover { background: rgba(74,144,217,.1); }
-  .cal-day.today { background: #4A90D9; color: #fff; }
-  .cal-day.has-entry .mood-dot { font-size: 16px; line-height: 1; }
-  .cal-day.empty { cursor: default; }
+  .cal-day:hover { transform: scale(1.06); background: #fff0e6; }
+  .cal-day:active { transform: scale(0.95); }
+  .cal-day.today { background: #f97316 !important; }
+  .cal-day.today .cal-day-num { color: #fff !important; font-weight: 900; }
+  .cal-day.has-entry { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .cal-day-num { font-size: 11px; font-weight: 700; color: #78716c; line-height: 1; }
+  .cal-day.today .cal-today-dot { display: none; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.2)} }
+  .mood-dot { font-size: 16px; line-height: 1; }
+  .cal-day.empty { cursor: default; border-color: transparent; background: transparent; }
   .cal-day.other-month { opacity: .3; }
+
+  /* ── MOOD LEGEND ── */
+  .mood-legend {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    padding: 0 4px; margin-bottom: 16px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend-label { font-size: 10px; font-weight: 700; color: #a8a29e; }
 
   .entry-list { display: flex; flex-direction: column; gap: 12px; }
   .entry-card {
@@ -180,12 +225,68 @@
   .save-btn:disabled { opacity: .5; cursor: default; transform: none; }
 
   .detail-mood-big { font-size: 80px; text-align: center; margin: 20px 0 8px; }
-  .detail-mood-name { text-align: center; font-size: 20px; font-weight: 800; color: #4A90D9; margin-bottom: 4px; }
+  .detail-mood-name { text-align: center; font-size: 24px; font-weight: 700; color: #f97316; margin-bottom: 4px; font-family: 'Gaegu', cursive; }
   .detail-date { text-align: center; font-size: 13px; color: var(--soft); margin-bottom: 24px; }
+  /* ── 줄노트 읽기 화면 ── */
   .detail-text {
-    background: var(--card); border-radius: 20px; padding: 20px;
-    font-size: 15px; line-height: 1.8; color: var(--text);
+    background: #fff;
+    border-radius: 20px; padding: 20px 20px 20px 48px;
+    font-size: 18px; line-height: 2.2; color: #3d3020;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; white-space: pre-wrap;
+    font-family: 'Gaegu', cursive;
+    position: relative;
+    background-image:
+      linear-gradient(transparent calc(2.2em - 1px), #e8e0d0 calc(2.2em), transparent calc(2.2em + 1px));
+    background-size: 100% 2.2em;
+    background-attachment: local;
+    border-left: 3px solid #f9a86a;
+  }
+  .detail-text::before {
+    content: '';
+    position: absolute; left: 36px; top: 0; bottom: 0;
+    width: 1px; background: rgba(249,115,22,0.2);
+  }
+
+  /* ── 그림일기 사진 ── */
+  .diary-photo-frame {
+    background: #fff;
+    border-radius: 20px; padding: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+    position: relative;
+    border: 2px solid #f0e8d8;
+  }
+  .diary-photo-frame::before {
+    content: '📷 오늘의 그림';
+    position: absolute; top: -12px; left: 16px;
+    background: #f97316; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 10px; border-radius: 20px;
+    font-family: 'Gaegu', cursive;
+  }
+  .diary-photo-frame img {
+    width: 100%; border-radius: 12px;
+    filter: saturate(0.85) contrast(1.05);
+  }
+
+  /* ── 달력 날씨 배경 ── */
+  .cal-wrap.weather-happy {
+    background: linear-gradient(160deg, #FFF9E6 0%, #FFFDE0 100%);
+  }
+  .cal-wrap.weather-good {
+    background: linear-gradient(160deg, #E8F4FD 0%, #EEF8FF 100%);
+  }
+  .cal-wrap.weather-meh {
+    background: linear-gradient(160deg, #F0F8EE 0%, #EEF7EC 100%);
+  }
+  .cal-wrap.weather-sad {
+    background: linear-gradient(160deg, #EEF3FA 0%, #E8EFFF 100%);
+  }
+  .cal-wrap.weather-angry {
+    background: linear-gradient(160deg, #FFF0EC 0%, #FFF5F0 100%);
+  }
+  .cal-wrap.weather-tired {
+    background: linear-gradient(160deg, #F3F0FA 0%, #EEE8FF 100%);
   }
   .detail-img { width: 100%; border-radius: 20px; margin-bottom: 20px; }
   .detail-actions { display: flex; gap: 10px; }
@@ -220,28 +321,31 @@
   .bottom-nav {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px;
-    background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
+    background: rgba(255,255,255,.95); backdrop-filter: blur(16px);
     border-top: 1px solid rgba(0,0,0,.06);
     display: flex; align-items: center; justify-content: space-around;
-    padding: 10px 20px 20px; z-index: 100;
+    padding: 8px 8px 20px; z-index: 100;
   }
   .nav-btn {
     display: flex; flex-direction: column; align-items: center; gap: 3px;
-    background: none; border: none; cursor: pointer; padding: 6px 16px;
-    border-radius: 14px; transition: all .15s;
+    background: none; border: none; cursor: pointer; padding: 6px 10px;
+    border-radius: 14px; transition: all .15s; flex: 1;
   }
-  .nav-btn .nav-icon { font-size: 22px; }
-  .nav-btn .nav-label { font-size: 10px; font-weight: 800; color: var(--soft); }
-  .nav-btn.active .nav-label { color: #4A90D9; }
-  .nav-btn:hover { background: #EEF6FF; }
+  .nav-btn .nav-icon { font-size: 20px; }
+  .nav-btn .nav-label { font-size: 9px; font-weight: 800; color: #a8a29e; }
+  .nav-btn.active .nav-icon { transform: scale(1.1); }
+  .nav-btn.active .nav-label { color: #f97316; }
+  .nav-btn:hover { background: #fff7ed; }
 
   .write-fab {
-    width: 56px; height: 56px; border-radius: 50%; border: none;
-    background: linear-gradient(135deg, #4A90D9, #74B9FF);
-    font-size: 26px; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(74,144,217,.5); transition: all .2s; color: #fff;
+    width: 52px; height: 52px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    font-size: 28px; font-weight: 300; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(249,115,22,.4); transition: all .2s; color: #fff;
+    flex-shrink: 0;
   }
-  .write-fab:hover { transform: scale(1.08); }
+  .write-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(249,115,22,.5); }
+  .write-fab:active { transform: scale(0.95); }
 
   .back-btn {
     display: flex; align-items: center; gap: 6px;
@@ -391,18 +495,23 @@
   </div>
 
   <div class="screen active" id="screenHome">
-    <div class="weather-hero">
-      <div class="hero-date" id="heroDate"></div>
-      <div class="hero-title" id="heroTitle">안녕! 오늘 기분은?</div>
-      <div class="hero-sub" id="heroSub">오늘 마음 날씨를 기록해봐 🌈</div>
-    </div>
     <div id="calView">
-      <div class="cal-header">
-        <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
-        <div class="cal-month" id="calMonth"></div>
-        <button class="cal-nav" onclick="changeMonth(1)">›</button>
+      <!-- 웰컴 카드 -->
+      <div class="welcome-card">
+        <h3 id="heroTitle">안녕! 오늘 기분은 어때? 😊</h3>
+        <p id="heroSub">매일매일 네 마음을 기록해봐!</p>
       </div>
-      <div class="cal-grid" id="calGrid"></div>
+      <!-- 달력 -->
+      <div class="cal-wrap">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+          <div class="cal-month" id="calMonth"></div>
+          <button class="cal-nav" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <!-- 감정 범례 -->
+      <div class="mood-legend" id="moodLegend"></div>
     </div>
     <div id="listView" style="display:none;">
       <div class="entry-list" id="entryList"></div>
@@ -446,7 +555,9 @@
     <div class="detail-sub-mood" id="detailSubMood" style="text-align:center;font-size:13px;color:#4A90D9;font-weight:800;margin-bottom:4px;"></div>
     <div class="detail-date" id="detailDate"></div>
     <div class="detail-text" id="detailText"></div>
-    <img id="detailImg" class="detail-img" src="" alt="" style="display:none;">
+    <div class="diary-photo-frame" id="detailImgFrame" style="display:none;">
+      <img id="detailImg" src="" alt="">
+    </div>
     <div class="detail-actions">
       <button class="action-btn edit" onclick="editEntry()">✏️ 수정</button>
       <button class="action-btn delete" onclick="deleteEntry()">🗑️ 삭제</button>
@@ -465,7 +576,11 @@
     <div class="top3-wrap" id="top3Wrap"></div>
     <div class="section-label" style="margin-top:24px;">요일별 감정 패턴</div>
     <div class="weekday-wrap" id="weekdayWrap"></div>
-    <div class="section-label" style="margin-top:24px;">보안 설정</div>
+  </div>
+
+  <!-- SCREEN: SETTINGS -->
+  <div class="screen" id="screenSettings">
+    <div class="section-label">보안 설정</div>
     <button class="pin-setting-btn" onclick="openPinSetting()">
       <div class="pin-setting-left">🔒 <span id="pinSettingLabel">비밀번호 설정</span></div>
       <div class="pin-setting-right" id="pinSettingStatus">설정 안 됨</div>
@@ -477,14 +592,22 @@
   </div>
 
   <nav class="bottom-nav" id="bottomNav">
-    <button class="nav-btn active" id="navHome" onclick="goHome()">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">홈</span>
+    <button class="nav-btn" id="navList" onclick="goList()">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">목록</span>
     </button>
-    <button class="write-fab" onclick="handleFab()" title="일기 쓰기">✏️</button>
+    <button class="nav-btn active" id="navCal" onclick="goCal()">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">달력</span>
+    </button>
+    <button class="write-fab" onclick="handleFab()" title="일기 쓰기">＋</button>
     <button class="nav-btn" id="navStat" onclick="goStats()">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">기록</span>
+      <span class="nav-label">통계</span>
+    </button>
+    <button class="nav-btn" id="navSettings" onclick="goSettings()">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">설정</span>
     </button>
   </nav>
 </div>
@@ -637,30 +760,40 @@ function updatePinSettingUI() {
 }
 
 function initApp() {
-  renderHero(); renderMoodPicker(); renderCalendar(); updatePinSettingUI();
-  document.getElementById('viewToggle').style.display = 'flex';
+  renderHero(); renderMoodPicker(); renderCalendar(); renderMoodLegend(); updatePinSettingUI();
+  document.getElementById('viewToggle').style.display = 'none';
+  setNavActive('navCal');
 }
 
 function init() { initLock(); }
 
 function renderHero() {
   const now = new Date();
-  const days = ['일','월','화','수','목','금','토'];
-  document.getElementById('heroDate').textContent =
-    `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`;
   const todayStr = toDateStr(now);
   const todayEntry = entries.find(e => e.date === todayStr);
   if (todayEntry) {
     const mood = MOODS.find(m => m.id === todayEntry.mood);
-    document.getElementById('heroTitle').textContent = `오늘은 ${mood.icon} ${mood.name}`;
-    document.getElementById('heroSub').textContent = todayEntry.text ? todayEntry.text.slice(0,30)+'...' : '일기를 작성했어요!';
+    document.getElementById('heroTitle').textContent = `오늘은 ${mood.icon} ${mood.name} 기분이구나!`;
+    document.getElementById('heroSub').textContent = todayEntry.text ? todayEntry.text.slice(0,30)+'...' : '일기를 작성했어요! 😊';
   } else {
-    document.getElementById('heroTitle').textContent = '안녕! 오늘 기분은?';
-    document.getElementById('heroSub').textContent = '오늘 마음 날씨를 기록해봐 🌈';
+    document.getElementById('heroTitle').textContent = '안녕! 오늘 기분은 어때? 😊';
+    document.getElementById('heroSub').textContent = '매일매일 네 마음을 기록해봐!';
   }
 }
 
+function renderMoodLegend() {
+  const legend = document.getElementById('moodLegend');
+  if (!legend) return;
+  const colors = { happy:'#FFD93D', good:'#74B9FF', meh:'#A8D8A8', sad:'#6B9FD4', angry:'#E17055', tired:'#9B8EC4' };
+  legend.innerHTML = MOODS.map(m => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[m.id]}"></div>
+      <span class="legend-label">${m.name}</span>
+    </div>`).join('');
+}
+
 function renderCalendar() {
+  const MOOD_COLORS = { happy:'#FFD93D', good:'#74B9FF', meh:'#A8D8A8', sad:'#6B9FD4', angry:'#E17055', tired:'#9B8EC4' };
   const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   document.getElementById('calMonth').textContent = `${calYear}년 ${months[calMonth]}`;
   const grid = document.getElementById('calGrid');
@@ -678,17 +811,39 @@ function renderCalendar() {
   for (let d = 1; d <= last.getDate(); d++) {
     const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const entry = entries.find(e => e.date === dateStr);
+    const isToday = dateStr === today;
     const el = document.createElement('div');
-    el.className = 'cal-day' + (dateStr === today ? ' today' : '') + (entry ? ' has-entry' : '');
+    el.className = 'cal-day' + (isToday ? ' today' : '') + (entry ? ' has-entry' : '');
     if (entry) {
       const mood = MOODS.find(m => m.id === entry.mood);
-      el.innerHTML = `<span class="mood-dot">${mood.icon}</span>`;
+      el.style.backgroundColor = mood.color;
+      el.style.boxShadow = `0 3px 10px ${mood.color}80`;
+      const numColor = isToday ? '#fff' : 'rgba(0,0,0,0.5)';
+      el.innerHTML = `<span class="cal-day-num" style="color:${numColor}">${d}</span><span class="mood-dot">${mood.icon}</span>`;
       el.onclick = () => showDetail(entry.id);
+    } else if (isToday) {
+      el.innerHTML = `<span class="cal-day-num">${d}</span>`;
+      el.onclick = () => goWrite(dateStr);
     } else {
-      el.innerHTML = `<span style="font-size:13px">${d}</span>`;
+      el.innerHTML = `<span class="cal-day-num">${d}</span>`;
       el.onclick = () => goWrite(dateStr);
     }
     grid.appendChild(el);
+  }
+  renderMoodLegend();
+
+  // 이번 달 가장 많은 감정으로 달력 배경 설정
+  const calWrap = document.querySelector('.cal-wrap');
+  if (calWrap) {
+    calWrap.className = 'cal-wrap';
+    const prefix = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+    const monthEntries = entries.filter(e => e.date.startsWith(prefix));
+    if (monthEntries.length > 0) {
+      const mc = {};
+      monthEntries.forEach(e => { mc[e.mood] = (mc[e.mood]||0)+1; });
+      const topMood = Object.entries(mc).sort((a,b)=>b[1]-a[1])[0][0];
+      calWrap.classList.add('weather-' + topMood);
+    }
   }
 }
 
@@ -873,7 +1028,8 @@ function showDetail(id) {
     `${dateObj.getFullYear()}년 ${dateObj.getMonth()+1}월 ${dateObj.getDate()}일 ${days[dateObj.getDay()]}요일`;
   document.getElementById('detailText').textContent = entry.text || '(내용이 없어요)';
   const img = document.getElementById('detailImg');
-  if (entry.img) { img.src = entry.img; img.style.display = 'block'; } else img.style.display = 'none';
+  const imgFrame = document.getElementById('detailImgFrame');
+  if (entry.img) { img.src = entry.img; imgFrame.style.display = 'block'; } else imgFrame.style.display = 'none';
   showScreen('screenDetail'); setNavActive(null);
   document.getElementById('viewToggle').style.display = 'none';
 }
@@ -924,6 +1080,7 @@ function goStats() {
   statsYear = new Date().getFullYear(); statsMonth = new Date().getMonth();
   renderStats(); showScreen('screenStats'); setNavActive('navStat');
   document.getElementById('viewToggle').style.display = 'none';
+  setWriteMode(false);
 }
 
 function changeStatsMonth(dir) {
@@ -992,11 +1149,33 @@ function renderStats() {
 }
 
 function goHome() {
+  goCal();
+}
+
+function goCal() {
   resetWrite(); renderHero(); renderCalendar();
-  if (currentView === 'list') renderList();
-  showScreen('screenHome'); setNavActive('navHome');
-  document.getElementById('viewToggle').style.display = 'flex';
+  showScreen('screenHome');
+  document.getElementById('calView').style.display = 'block';
+  document.getElementById('listView').style.display = 'none';
+  setNavActive('navCal');
+  document.getElementById('viewToggle').style.display = 'none';
   setWriteMode(false);
+}
+
+function goList() {
+  resetWrite(); renderList();
+  showScreen('screenHome');
+  document.getElementById('calView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+  setNavActive('navList');
+  document.getElementById('viewToggle').style.display = 'none';
+  setWriteMode(false);
+}
+
+function goSettings() {
+  showScreen('screenSettings');
+  setNavActive('navSettings');
+  document.getElementById('viewToggle').style.display = 'none';
 }
 
 function goWrite(dateStr) {
