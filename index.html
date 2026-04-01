@@ -10,7 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Nanum+Round+Gothic:wght@400;700;800&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-hand.css" rel="stylesheet">
 <link href="https://hangeul.pstatic.net/hangeul_static/css/na-all.css" rel="stylesheet">
-<style>@font-face { font-family: "NanumSonPyeonji"; src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.eot"); src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.eot?#iefix") format("embedded-opentype"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.woff") format("woff"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.ttf") format("truetype"); }
+<style>@font-face { font-family: "NanumDahye"; src: url("나눔손글씨 다행체.ttf") format("truetype"); }
+@font-face { font-family: "NanumSonPyeonji"; src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.eot"); src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.eot?#iefix") format("embedded-opentype"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.woff") format("woff"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumSonPyeonji/NanumSonPyeonji.ttf") format("truetype"); }
 @font-face { font-family: "NanumBrush"; src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumBrushScript/NanumBrushScript.eot"); src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumBrushScript/NanumBrushScript.eot?#iefix") format("embedded-opentype"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumBrushScript/NanumBrushScript.woff") format("woff"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumBrushScript/NanumBrushScript.ttf") format("truetype"); }
 @font-face { font-family: "NanumNeuritNeurit"; src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumNeuritNeurit/NanumNeuritNeurit.eot"); src: url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumNeuritNeurit/NanumNeuritNeurit.eot?#iefix") format("embedded-opentype"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumNeuritNeurit/NanumNeuritNeurit.woff") format("woff"), url("https://hangeul.pstatic.net/hangeul_static/webfont/NanumNeuritNeurit/NanumNeuritNeurit.ttf") format("truetype"); }</style>
 <style>
@@ -32,7 +33,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'NanumDahye', 'NanumSonPyeonji', cursive;
+    font-family: 'NanumDahye', 'NanumDahye', cursive;
     background: #faf9f7;
     color: var(--text);
     min-height: 100vh;
@@ -87,8 +88,8 @@
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     animation: fadeIn .4s ease;
   }
-  .welcome-card h3 { font-size: 22px; font-weight: 700; color: #44403c; margin-bottom: 4px; font-family: 'NanumDahye', 'NanumSonPyeonji', cursive; }
-  .welcome-card p { font-size: 16px; color: #a8a29e; font-family: 'NanumDahye', 'NanumSonPyeonji', cursive; }
+  .welcome-card h3 { font-size: 22px; font-weight: 700; color: #44403c; margin-bottom: 4px; font-family: 'NanumDahye', 'NanumDahye', cursive; }
+  .welcome-card p { font-size: 16px; color: #a8a29e; font-family: 'NanumDahye', 'NanumDahye', cursive; }
 
   /* ── CALENDAR ── */
   .cal-wrap {
@@ -224,7 +225,7 @@
   .date-picker {
     flex: 1; padding: 10px 14px; border-radius: 14px;
     border: 2px solid #E0ECFF; background: #fff;
-    font-family: 'NanumSonPyeonji', cursive; font-size: 17px; color: #3d3020;
+    font-family: 'NanumDahye', cursive; font-size: 17px; color: #3d3020;
     outline: none; cursor: pointer;
   }
   .date-picker:focus { border-color: #f97316; }
@@ -248,7 +249,7 @@
     position: sticky; top: 0; z-index: 10;
   }
   .note-date-row {
-    font-family: 'NanumSonPyeonji', cursive;
+    font-family: 'NanumDahye', cursive;
     font-size: 22px; font-weight: 700; color: #333;
     letter-spacing: 2px;
   }
@@ -269,28 +270,78 @@
   }
   .mood-area-icon { font-size: 64px; line-height: 1; }
   .mood-area-name {
-    font-family: 'NanumSonPyeonji', cursive;
+    font-family: 'NanumDahye', cursive;
     font-size: 24px; font-weight: 700; color: #f97316;
   }
   .mood-area-sub {
-    font-family: 'NanumSonPyeonji', cursive;
+    font-family: 'NanumDahye', cursive;
     font-size: 16px; color: #aaa;
   }
   .mood-area .diary-photo-frame {
     width: 100%; margin-top: 16px; margin-bottom: 0;
   }
 
+  /* ── 상세 화면 ── */
+  .detail-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 12px;
+  }
+  .detail-header-date {
+    font-family: 'NanumDahye', cursive;
+    font-size: 20px; font-weight: 700; color: #333;
+    background: #fff; border-radius: 14px;
+    padding: 10px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    flex: 1; margin: 0 10px; text-align: center;
+  }
+  .detail-header .action-btn {
+    padding: 8px 10px; font-size: 16px;
+    background: #fff; border: none; cursor: pointer;
+    border-radius: 12px; transition: background .15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .detail-header .action-btn:hover { background: #f5f5f5; }
+
+  .detail-mood-card {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 28px 20px 24px; margin: 0 0 16px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    gap: 6px;
+  }
+  .detail-mood-card-icon { font-size: 72px; line-height: 1; }
+  .detail-mood-card-name {
+    font-family: 'NanumDahye', cursive;
+    font-size: 26px; font-weight: 700; color: #f97316;
+  }
+  .detail-mood-card-sub {
+    font-family: 'NanumDahye', cursive;
+    font-size: 16px; color: #aaa;
+  }
+
+  /* 일반 텍스트 (줄노트 없음) */
+  .detail-text-plain {
+    background: #fff;
+    border-radius: 24px;
+    padding: 20px;
+    font-size: 20px; line-height: 1.9; color: #333;
+    font-family: 'NanumDahye', cursive;
+    white-space: pre-wrap; min-height: 200px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
   .detail-mood-big { font-size: 80px; text-align: center; margin: 20px 0 8px; }
-  .detail-mood-name { text-align: center; font-size: 24px; font-weight: 700; color: #f97316; margin-bottom: 4px; font-family: 'NanumDahye', 'NanumSonPyeonji', cursive; }
+  .detail-mood-name { text-align: center; font-size: 24px; font-weight: 700; color: #f97316; margin-bottom: 4px; font-family: 'NanumDahye', 'NanumDahye', cursive; }
   .detail-date { text-align: center; font-size: 13px; color: var(--soft); margin-bottom: 24px; }
-  .detail-mood-name { font-size: 20px; font-weight: 700; color: #555; font-family: 'NanumSonPyeonji', cursive; }
+  .detail-mood-name { font-size: 20px; font-weight: 700; color: #555; font-family: 'NanumDahye', cursive; }
   /* ── 줄노트 읽기 화면 ── */
   .detail-text {
     background: #fefefe;
     border-radius: 0; padding: 4px 20px 20px 20px;
     font-size: 20px; line-height: 2.2; color: #222;
     margin-bottom: 0; white-space: pre-wrap;
-    font-family: 'NanumDahye', 'NanumSonPyeonji', cursive;
+    font-family: 'NanumDahye', 'NanumDahye', cursive;
     position: relative; min-height: 300px;
     background-image: linear-gradient(transparent calc(2.2em - 1px), #d0d8e4 calc(2.2em));
     background-size: 100% 2.2em;
@@ -313,7 +364,7 @@
     background: #f97316; color: #fff;
     font-size: 11px; font-weight: 700;
     padding: 2px 10px; border-radius: 20px;
-    font-family: 'NanumDahye', 'NanumSonPyeonji', cursive;
+    font-family: 'NanumDahye', 'NanumDahye', cursive;
   }
   .diary-photo-frame img {
     width: 100%; border-radius: 12px;
@@ -603,30 +654,32 @@
     <button class="save-btn" id="saveBtn" onclick="saveEntry()">오늘 마음날씨 저장하기 ✨</button>
   </div>
 
-  <div class="screen" id="screenDetail" style="padding:0 0 100px;">
-    <!-- 상단: 날짜 + 수정/삭제 -->
-    <div class="note-header">
+  <div class="screen" id="screenDetail">
+    <!-- 날짜만 최상단 -->
+    <div class="detail-header">
       <button class="back-btn" style="margin:0;" onclick="goHome()">←</button>
-      <div class="note-date-row" id="detailDate"></div>
-      <div class="note-actions">
+      <div class="detail-header-date" id="detailDate"></div>
+      <div style="display:flex;gap:6px;">
         <button class="action-btn edit" onclick="editEntry()">✏️</button>
         <button class="action-btn delete" onclick="deleteEntry()">🗑️</button>
       </div>
     </div>
 
-    <!-- 중간: 감정 표현 영역 -->
-    <div class="mood-area">
-      <div class="mood-area-icon" id="detailMoodIcon"></div>
-      <div class="mood-area-name" id="detailMoodName"></div>
-      <div class="mood-area-sub" id="detailSubMood"></div>
-      <!-- 이미지: 이모지 아래 배치 -->
-      <div class="diary-photo-frame" id="detailImgFrame" style="display:none;">
-        <img id="detailImg" src="" alt="">
-      </div>
+    <!-- 선택한 기분 하나만 -->
+    <div class="detail-mood-card" id="detailMoodCard">
+      <div class="detail-mood-card-icon" id="detailMoodIcon"></div>
+      <div class="detail-mood-card-name" id="detailMoodName"></div>
+      <div class="detail-mood-card-sub" id="detailSubMood"></div>
     </div>
 
-    <!-- 하단: 줄노트 일기 영역 -->
-    <div class="detail-text" id="detailText"></div>
+    <!-- 사진 (기분 아래) -->
+    <div class="diary-photo-frame" id="detailImgFrame" style="display:none;">
+      <img id="detailImg" src="" alt="">
+    </div>
+
+    <!-- 오늘 있었던 일 - 일반 텍스트 -->
+    <div class="section-label" style="margin-top:8px;">오늘 있었던 일</div>
+    <div class="detail-text-plain" id="detailText"></div>
   </div>
 
   <div class="screen" id="screenStats">
@@ -1087,15 +1140,24 @@ function showDetail(id) {
   const mood = MOODS.find(m => m.id === entry.mood);
   const dateObj = new Date(entry.date);
   const days = ['일','월','화','수','목','금','토'];
+
+  // 날짜만 심플하게
+  document.getElementById('detailDate').textContent =
+    `${dateObj.getFullYear()}. ${String(dateObj.getMonth()+1).padStart(2,'0')}. ${String(dateObj.getDate()).padStart(2,'0')}. (${days[dateObj.getDay()]})`;
+
+  // 선택한 기분 하나만
   document.getElementById('detailMoodIcon').textContent = mood.icon;
   document.getElementById('detailMoodName').textContent = mood.name;
   document.getElementById('detailSubMood').textContent = entry.subMood ? `"${entry.subMood}"` : '';
-  document.getElementById('detailDate').textContent =
-    `${dateObj.getMonth()+1}월  ${dateObj.getDate()}일  ${days[dateObj.getDay()]}`;
+
+  // 텍스트 일반 노출
   document.getElementById('detailText').textContent = entry.text || '(내용이 없어요)';
+
+  // 사진
   const img = document.getElementById('detailImg');
   const imgFrame = document.getElementById('detailImgFrame');
   if (entry.img) { img.src = entry.img; imgFrame.style.display = 'block'; } else imgFrame.style.display = 'none';
+
   showScreen('screenDetail'); setNavActive(null);
   document.getElementById('viewToggle').style.display = 'none';
 }
