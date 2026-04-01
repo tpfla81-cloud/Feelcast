@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="오늘마음날씨">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Nanum+Round+Gothic:wght@400;700;800&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-hand.css" rel="stylesheet">
 <style>
   :root {
     --sky: #87CEEB;
@@ -27,7 +28,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Gaegu', 'Nanum Pen Script', cursive;
+    font-family: 'NanumPen', 'Nanum Pen Script', cursive;
     background: #faf9f7;
     color: var(--text);
     min-height: 100vh;
@@ -82,8 +83,8 @@
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     animation: fadeIn .4s ease;
   }
-  .welcome-card h3 { font-size: 22px; font-weight: 700; color: #44403c; margin-bottom: 4px; font-family: 'Gaegu', cursive; }
-  .welcome-card p { font-size: 16px; color: #a8a29e; font-family: 'Gaegu', cursive; }
+  .welcome-card h3 { font-size: 22px; font-weight: 700; color: #44403c; margin-bottom: 4px; font-family: 'NanumPen', 'Nanum Pen Script', cursive; }
+  .welcome-card p { font-size: 16px; color: #a8a29e; font-family: 'NanumPen', 'Nanum Pen Script', cursive; }
 
   /* ── CALENDAR ── */
   .cal-wrap {
@@ -214,6 +215,16 @@
     border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 14px;
   }
 
+  /* ── 날짜 선택 ── */
+  .date-selector-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .date-picker {
+    flex: 1; padding: 10px 14px; border-radius: 14px;
+    border: 2px solid #E0ECFF; background: #fff;
+    font-family: 'NanumPen', cursive; font-size: 17px; color: #3d3020;
+    outline: none; cursor: pointer;
+  }
+  .date-picker:focus { border-color: #f97316; }
+
   .save-btn {
     width: 100%; padding: 16px; border-radius: 18px; border: none;
     background: linear-gradient(135deg, #4A90D9, #74B9FF);
@@ -225,26 +236,31 @@
   .save-btn:disabled { opacity: .5; cursor: default; transform: none; }
 
   .detail-mood-big { font-size: 80px; text-align: center; margin: 20px 0 8px; }
-  .detail-mood-name { text-align: center; font-size: 24px; font-weight: 700; color: #f97316; margin-bottom: 4px; font-family: 'Gaegu', cursive; }
+  .detail-mood-name { text-align: center; font-size: 24px; font-weight: 700; color: #f97316; margin-bottom: 4px; font-family: 'NanumPen', 'Nanum Pen Script', cursive; }
   .detail-date { text-align: center; font-size: 13px; color: var(--soft); margin-bottom: 24px; }
   /* ── 줄노트 읽기 화면 ── */
   .detail-text {
     background: #fff;
-    border-radius: 20px; padding: 20px 20px 20px 48px;
-    font-size: 18px; line-height: 2.2; color: #3d3020;
+    border-radius: 20px; padding: 16px 16px 16px 56px;
+    font-size: 19px; line-height: 2.0; color: #1a1a2e;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; white-space: pre-wrap;
-    font-family: 'Gaegu', cursive;
-    position: relative;
+    font-family: 'NanumPen', 'Nanum Pen Script', cursive;
+    position: relative; overflow: hidden; min-height: 200px;
     background-image:
-      linear-gradient(transparent calc(2.2em - 1px), #e8e0d0 calc(2.2em), transparent calc(2.2em + 1px));
-    background-size: 100% 2.2em;
+      linear-gradient(transparent calc(2.0em - 1px), #c8d8e8 calc(2.0em), transparent calc(2.0em));
+    background-size: 100% 2.0em;
     background-attachment: local;
-    border-left: 3px solid #f9a86a;
   }
   .detail-text::before {
     content: '';
-    position: absolute; left: 36px; top: 0; bottom: 0;
-    width: 1px; background: rgba(249,115,22,0.2);
+    position: absolute; left: 44px; top: 0; bottom: 0;
+    width: 2px; background: #e05050; opacity: 0.6;
+    z-index: 1;
+  }
+  .detail-text::after {
+    content: '';
+    position: absolute; left: 48px; top: 0; bottom: 0;
+    width: 1px; background: #e89090; opacity: 0.3;
   }
 
   /* ── 그림일기 사진 ── */
@@ -262,7 +278,7 @@
     background: #f97316; color: #fff;
     font-size: 11px; font-weight: 700;
     padding: 2px 10px; border-radius: 20px;
-    font-family: 'Gaegu', cursive;
+    font-family: 'NanumPen', 'Nanum Pen Script', cursive;
   }
   .diary-photo-frame img {
     width: 100%; border-radius: 12px;
@@ -520,6 +536,10 @@
 
   <div class="screen" id="screenWrite">
     <button class="back-btn" onclick="goHome()">← 돌아가기</button>
+    <div class="date-selector-wrap">
+      <label class="section-label" for="entryDatePicker">📅 날짜</label>
+      <input type="date" id="entryDatePicker" class="date-picker">
+    </div>
     <div class="section-label">오늘 기분이 어때?</div>
     <div class="mood-picker" id="moodPicker"></div>
     <div id="subMoodSection" style="display:none;">
@@ -990,7 +1010,8 @@ function removeImg() {
 function saveEntry() {
   if (!selectedMood) { showToast('기분을 먼저 골라줘! 😊'); return; }
   const text = document.getElementById('diaryText').value.trim();
-  const dateStr = editingId ? entries.find(e=>e.id===editingId).date : toDateStr(new Date());
+  const picker = document.getElementById('entryDatePicker');
+  const dateStr = editingId ? entries.find(e=>e.id===editingId).date : (picker.value || toDateStr(new Date()));
   if (editingId) {
     const idx = entries.findIndex(e => e.id === editingId);
     entries[idx] = { ...entries[idx], mood: selectedMood, subMood: selectedSubMood, text, img: uploadedImg };
@@ -1000,8 +1021,8 @@ function saveEntry() {
     else entries.push({ id: Date.now().toString(), date: dateStr, mood: selectedMood, subMood: selectedSubMood, text, img: uploadedImg });
   }
   localStorage.setItem('moodiary_entries', JSON.stringify(entries));
-  showToast('오늘 마음날씨 저장 완료! ✨');
-  resetWrite(); setWriteMode(false); goHome();
+  showToast('일기를 저장했어요! 📔');
+  resetWrite(); setWriteMode(false); goList();
 }
 
 function resetWrite() {
@@ -1182,6 +1203,12 @@ function goWrite(dateStr) {
   resetWrite(); showScreen('screenWrite'); setNavActive(null);
   document.getElementById('viewToggle').style.display = 'none';
   setWriteMode(true);
+
+  // 날짜 피커 기본값 설정
+  const picker = document.getElementById('entryDatePicker');
+  const targetDate = dateStr || toDateStr(new Date());
+  picker.value = targetDate;
+
   if (dateStr) {
     const existing = entries.find(e => e.date === dateStr);
     if (existing) {
