@@ -242,27 +242,44 @@
   /* ── 노트 상세 레이아웃 ── */
   .note-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px 12px;
+    padding: 16px 20px 14px;
     border-bottom: 2px solid #d0d8e4;
     background: #fefefe;
+    position: sticky; top: 0; z-index: 10;
   }
   .note-date-row {
     font-family: 'NanumSonPyeonji', cursive;
     font-size: 22px; font-weight: 700; color: #333;
     letter-spacing: 2px;
   }
-  .note-actions { display: flex; gap: 6px; }
+  .note-actions { display: flex; gap: 4px; }
   .note-actions .action-btn {
     padding: 6px 10px; font-size: 16px;
     background: none; border: none; cursor: pointer;
+    border-radius: 10px; transition: background .15s;
   }
-  .note-mood-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 20px 8px;
-    border-bottom: 1px solid #e8edf2;
+  .note-actions .action-btn:hover { background: #f5f5f5; }
+
+  /* ── 감정 표현 영역 (중간) ── */
+  .mood-area {
     background: #fefefe;
-    font-family: 'NanumSonPyeonji', cursive;
+    padding: 28px 20px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    border-bottom: 1px solid #e8edf2;
   }
+  .mood-area-icon { font-size: 64px; line-height: 1; }
+  .mood-area-name {
+    font-family: 'NanumSonPyeonji', cursive;
+    font-size: 24px; font-weight: 700; color: #f97316;
+  }
+  .mood-area-sub {
+    font-family: 'NanumSonPyeonji', cursive;
+    font-size: 16px; color: #aaa;
+  }
+  .mood-area .diary-photo-frame {
+    width: 100%; margin-top: 16px; margin-bottom: 0;
+  }
+
   .detail-mood-big { font-size: 80px; text-align: center; margin: 20px 0 8px; }
   .detail-mood-name { text-align: center; font-size: 24px; font-weight: 700; color: #f97316; margin-bottom: 4px; font-family: 'NanumDahye', 'NanumSonPyeonji', cursive; }
   .detail-date { text-align: center; font-size: 13px; color: var(--soft); margin-bottom: 24px; }
@@ -587,7 +604,7 @@
   </div>
 
   <div class="screen" id="screenDetail" style="padding:0 0 100px;">
-    <!-- 노트 헤더 -->
+    <!-- 상단: 날짜 + 수정/삭제 -->
     <div class="note-header">
       <button class="back-btn" style="margin:0;" onclick="goHome()">←</button>
       <div class="note-date-row" id="detailDate"></div>
@@ -596,18 +613,20 @@
         <button class="action-btn delete" onclick="deleteEntry()">🗑️</button>
       </div>
     </div>
-    <!-- 감정 행 -->
-    <div class="note-mood-row">
-      <span id="detailMoodIcon" style="font-size:28px;"></span>
-      <span class="detail-mood-name" id="detailMoodName"></span>
-      <span id="detailSubMood" style="font-size:14px;color:#888;"></span>
+
+    <!-- 중간: 감정 표현 영역 -->
+    <div class="mood-area">
+      <div class="mood-area-icon" id="detailMoodIcon"></div>
+      <div class="mood-area-name" id="detailMoodName"></div>
+      <div class="mood-area-sub" id="detailSubMood"></div>
+      <!-- 이미지: 이모지 아래 배치 -->
+      <div class="diary-photo-frame" id="detailImgFrame" style="display:none;">
+        <img id="detailImg" src="" alt="">
+      </div>
     </div>
-    <!-- 줄노트 본문 -->
+
+    <!-- 하단: 줄노트 일기 영역 -->
     <div class="detail-text" id="detailText"></div>
-    <!-- 사진 -->
-    <div class="diary-photo-frame" id="detailImgFrame" style="display:none;margin:0 20px 20px;">
-      <img id="detailImg" src="" alt="">
-    </div>
   </div>
 
   <div class="screen" id="screenStats">
